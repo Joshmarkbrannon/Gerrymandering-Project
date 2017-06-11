@@ -8,13 +8,16 @@ public class Voter : MonoBehaviour
     [SerializeField]
     private SpriteRenderer voterSprite;
     [SerializeField]
-    private SpriteRenderer districtSprite;
+    private SpriteRenderer precinctSprite;
     [HideInInspector]
     public Vector2 voterID = new Vector2(0,0);
+    private DistrictManager _manager;
+    [HideInInspector]
+    public bool InADistrict = false;
 
     void Start ()
     {
-		
+        _manager = Camera.main.GetComponent<DistrictManager>();
 	}
 
     public void SetColor(VoterType party)
@@ -36,9 +39,17 @@ public class Voter : MonoBehaviour
 
     }
 
-    public void DistrictClicked()
+    public void PrecinctSelected()
     {
-        Debug.Log("clicked: " + voterID);
-        districtSprite.color = new Color(0, 0, 0, 0.3f);
+        if (Input.GetMouseButton(0) && InADistrict == false)
+        {
+            _manager.CheckSelectLimit(this.gameObject);
+            //Debug.Log("clicked: " + voterID);
+        }
+    }
+
+    public void DistrictDrawn(Color districtColor)
+    {
+        precinctSprite.color = districtColor;
     }
 }

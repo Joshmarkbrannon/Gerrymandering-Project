@@ -51,7 +51,6 @@ public class DotGrid : MonoBehaviour
         //Set up the rest of the positions based on the first column
         foreach (Vector3 j in columnOne)
         {
-            Debug.Log("pos:" + j);
             gridPos.Add(j);
 
             for (int k = 1; k <dotRows; k++)
@@ -101,7 +100,6 @@ public class DotGrid : MonoBehaviour
         //Set up the rest of the positions based on the first column
         foreach (Vector3 j in rowOne)
         {
-            Debug.Log("pos:" + j);
             gridPos.Add(j);
             GenerateGridPoint(rowOne[l], l, 0);
 
