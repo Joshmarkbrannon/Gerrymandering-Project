@@ -7,45 +7,56 @@ public class DotGrid : MonoBehaviour
     [SerializeField]
     private GameObject _dot;
     [SerializeField]
+    private Transform _dotContainer;
+    [SerializeField]
     private GameObject _voter;
     [SerializeField]
-    private Vector3 _origin;
-    [SerializeField]
-    private Vector2 _spacing;
-    [SerializeField]
-    private int _rows;
-    [SerializeField]
-    private int _columns;
+    private Transform _voterContainer;
     private List<GameObject> voters = new List<GameObject>();
+    private LevelData level;
 
-    void Start ()
+
+    public void DestroyLevel()
     {
+        if (_dotContainer.childCount > 0 && _voterContainer.childCount > 0)
+        {
+            foreach (Transform child in _dotContainer)
+                Destroy(child.gameObject);
+            foreach (Transform child in _voterContainer)
+                Destroy(child.gameObject);
+        }
+    }
+
+    //Get the level info from game manager and begin constructing the level
+    public void NewLevel(LevelData newLevel)
+    {
+        level = newLevel;
         ConstructDotGrid();
-	}
+    }
 
     private void ConstructDotGrid()
     {
-        List<Vector3> columnOne = new List<Vector3>();
+        List <Vector3> columnOne = new List<Vector3>();
         List<Vector3> gridPos = new List<Vector3>();
 
-        int dotColumns = _columns + 1;
-        int dotRows = _rows + 1;
+        int dotColumns = level.columns + 1;
+        int dotRows = level.rows + 1;
 
         //Set the dot in the upper left corner first
         float columnOffset = 0;
         float rowOffset = 0;
 
         if (dotColumns % 2 == 0)
-            columnOffset = Mathf.Abs(_spacing.x) / 2;
+            columnOffset = Mathf.Abs(level.spacing.x) / 2;
         if (dotRows % 2 == 0)
-            rowOffset = Mathf.Abs(_spacing.y) / 2;
+            rowOffset = Mathf.Abs(level.spacing.y) / 2;
 
-        columnOne.Add(new Vector3(_origin.x - columnOffset - (((dotColumns-1) / 2)*_spacing.x), _origin.y + rowOffset + (((dotRows - 1) / 2) * _spacing.y), 0));
+        columnOne.Add(new Vector3(level.origin.x - columnOffset - (((dotColumns-1) / 2)*level.spacing.x), level.origin.y + rowOffset + (((dotRows - 1) / 2) * level.spacing.y), 0));
 
         //Set up the first column positions
         for (int i = columnOne.Count; i < dotColumns; i++)
         {
-            columnOne.Add(columnOne[0] + new Vector3(i * _spacing.x, 0, 0));
+            columnOne.Add(columnOne[0] + new Vector3(i * level.spacing.x, 0, 0));
         }
 
         //Set up the rest of the positions based on the first column
@@ -55,14 +66,15 @@ public class DotGrid : MonoBehaviour
 
             for (int k = 1; k <dotRows; k++)
             {
-                gridPos.Add(j + new Vector3(0, k * -_spacing.y, 0));
+                gridPos.Add(j + new Vector3(0, k * -level.spacing.y, 0));
             }
         }
 
         //Create the grid
         foreach (Vector3 pos in gridPos)
         {
-            Instantiate(_dot, pos, Quaternion.identity);
+            GameObject gridPoint = Instantiate(_dot, pos, Quaternion.identity);
+            gridPoint.transform.SetParent(_dotContainer);
         }
 
         PopulateGrid();
@@ -75,24 +87,24 @@ public class DotGrid : MonoBehaviour
         List<Vector3> rowOne = new List<Vector3>();
         List<Vector3> gridPos = new List<Vector3>();
 
-        int dotColumns = _columns;
-        int dotRows = _rows;
+        int dotColumns = level.columns;
+        int dotRows = level.rows;
 
         //Set the voter in the upper left corner first
         float columnOffset = 0;
         float rowOffset = 0;
 
         if (dotColumns % 2 == 0)
-            columnOffset = Mathf.Abs(_spacing.x) / 2;
+            columnOffset = Mathf.Abs(level.spacing.x) / 2;
         if (dotRows % 2 == 0)
-            rowOffset = Mathf.Abs(_spacing.y) / 2;
+            rowOffset = Mathf.Abs(level.spacing.y) / 2;
 
-        rowOne.Add(new Vector3(_origin.x - columnOffset - (((dotColumns - 1) / 2) * _spacing.x), _origin.y + rowOffset + (((dotRows - 1) / 2) * _spacing.y), 0));
+        rowOne.Add(new Vector3(level.origin.x - columnOffset - (((dotColumns - 1) / 2) * level.spacing.x), level.origin.y + rowOffset + (((dotRows - 1) / 2) * level.spacing.y), 0));
 
         //Set up the first column positions
         for (int i = rowOne.Count; i < dotColumns; i++)
         {
-            rowOne.Add(rowOne[0] + new Vector3(i * _spacing.x, 0, 0));
+            rowOne.Add(rowOne[0] + new Vector3(i * level.spacing.x, 0, 0));
         }
 
         int l = 0;
@@ -105,7 +117,7 @@ public class DotGrid : MonoBehaviour
 
             for (int k = 1; k < dotRows; k++)
             {
-                Vector3 newPos = j + new Vector3(0, k * -_spacing.y, 0);
+                Vector3 newPos = j + new Vector3(0, k * -level.spacing.y, 0);
                 gridPos.Add(newPos);
                 GenerateGridPoint(newPos, l, k);
             }
@@ -117,6 +129,8 @@ public class DotGrid : MonoBehaviour
     void GenerateGridPoint(Vector3 pos, int xIndex, int yIndex)
     {
         GameObject newVoter = Instantiate(_voter, pos, Quaternion.identity);
+        newVoter.transform.SetParent(_voterContainer);
+        newVoter.transform.localScale = new Vector3(level.spacing.x, level.spacing.y, 1);
         voters.Add(newVoter);
         Voter voter = newVoter.GetComponent<Voter>();
         voter.voterID = new Vector2(xIndex, yIndex);

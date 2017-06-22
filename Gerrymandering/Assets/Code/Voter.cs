@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Voter : MonoBehaviour
 {
-    public enum VoterType {Democrat, Republican, Independant};
+    public enum VoterType {Democrat, Republican};
+    public VoterType voterParty;
     [SerializeField]
     private SpriteRenderer voterSprite;
     [SerializeField]
@@ -13,25 +14,29 @@ public class Voter : MonoBehaviour
     public Vector2 voterID = new Vector2(0,0);
     private DistrictManager _manager;
     [HideInInspector]
-    public bool InADistrict = false;
+    public bool inADistrict = false;
+    [HideInInspector]
+    public int districtIndex;
+    [SerializeField]
+    private PartyColors partyColors;
 
-    void Start ()
+
+    void Start()
     {
-        _manager = Camera.main.GetComponent<DistrictManager>();
-	}
+        _manager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<DistrictManager>();
+    }
 
     public void SetColor(VoterType party)
     {
         switch (party)
         {
             case VoterType.Democrat:
-                voterSprite.color = Color.blue;
+                voterParty = VoterType.Democrat;
+                voterSprite.color = partyColors.democratColor;
                 break;
             case VoterType.Republican:
-                voterSprite.color = Color.red;
-                break;
-            case VoterType.Independant:
-                voterSprite.color = Color.green;
+                voterParty = VoterType.Republican;
+                voterSprite.color = partyColors.republicanColor;
                 break;
             default:
                 break;
@@ -41,11 +46,16 @@ public class Voter : MonoBehaviour
 
     public void PrecinctSelected()
     {
-        if (Input.GetMouseButton(0) && InADistrict == false)
+        if (Input.GetMouseButton(0) && inADistrict == false)
         {
             _manager.CheckSelectLimit(this.gameObject);
             //Debug.Log("clicked: " + voterID);
         }
+    }
+
+    public void DestroyPrecinct()
+    {
+        _manager.DestroyDistrict(districtIndex);
     }
 
     public void DistrictDrawn(Color districtColor)
