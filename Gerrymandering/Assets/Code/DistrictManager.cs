@@ -75,13 +75,13 @@ public class DistrictManager : MonoBehaviour
                     {
                         _UI.ClearSelection();
                     }
+                    if (districtCount == maxDistricts)
+                    {
+                        _manager.DeclareResults(democratDistricts, republicanDistricts);
+                    }
 
                         //Check for game over once max districts reached
                         Debug.Log("district number: " + currentDistrict);
-                }
-                else
-                {
-                    _manager.DeclareResults(democratDistricts, republicanDistricts);
                 }
             }
             //If there's only one precinct in the district

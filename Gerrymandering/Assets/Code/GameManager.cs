@@ -10,7 +10,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private DistrictManager _district;
     [SerializeField]
-    private UIManager _UI;
+    private UIManager _gameUI;
+    [SerializeField]
+    private GameObject _completeUI;
     public LevelData[] levelData;
 
 
@@ -29,20 +31,30 @@ public class GameManager : MonoBehaviour
         //Clear out existing level, if there is one
         _grid.DestroyLevel();
 
-        if (isProgressing)
+        if (isProgressing && currentLevel < levelData.Length)
             currentLevel++;
 
         //Send the information about the current level to the grid constructor
         _grid.NewLevel(levelData[currentLevel]);
-        _UI.InitializeUI(levelData[currentLevel].maxDistricts);
+        _gameUI.InitializeUI(levelData[currentLevel].maxDistricts);
         _district.NewLevel(levelData[currentLevel].maxDistricts, levelData[currentLevel].maxPrecinctSize);
     }
 
     public void DeclareResults(int democratAreas, int republicanAreas)
     {
-        if (democratAreas > republicanAreas)
+        Transform voterRegistry = _grid._voterContainer;
+        foreach (Transform child in voterRegistry)
         {
+            if (child.GetComponent<Voter>().inADistrict == false)
+            {
+                _gameUI.UpdateText("No voter left behind!");
+                return;
+            }
+        }
 
+        if (republicanAreas > democratAreas)
+        {
+            _completeUI.SetActive(true);
         }
     }
 }

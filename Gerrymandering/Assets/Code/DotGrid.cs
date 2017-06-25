@@ -10,9 +10,9 @@ public class DotGrid : MonoBehaviour
     private Transform _dotContainer;
     [SerializeField]
     private GameObject _voter;
-    [SerializeField]
-    private Transform _voterContainer;
-    private List<GameObject> voters = new List<GameObject>();
+    public Transform _voterContainer;
+    [HideInInspector]
+    public List<GameObject> voters = new List<GameObject>();
     private LevelData level;
 
 

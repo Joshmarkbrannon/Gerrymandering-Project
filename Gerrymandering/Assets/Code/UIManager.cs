@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -9,10 +10,14 @@ public class UIManager : MonoBehaviour
     private GameObject _districtUI;
     [SerializeField]
     private Transform _districtUIHolder;
+    [SerializeField]
+    private TextMeshProUGUI _text;
+    [SerializeField]
+    private string _defaultText;
 
     private List<GameObject> districtUIObjects;
 
-    void Start()
+    void Awake()
     {
         districtUIObjects = new List<GameObject>();
     }
@@ -34,10 +39,12 @@ public class UIManager : MonoBehaviour
             district.transform.SetParent(_districtUIHolder);
             district.transform.localScale = Vector3.one;
             districtUIObjects.Add(district);
-
-            //Set the first one to be selected
-            districtUIObjects[0].GetComponent<DistrictUI>().SetSelected(true);
         }
+
+        //Set the first one to be selected
+        districtUIObjects[0].GetComponent<DistrictUI>().SetSelected(true);
+        //reset text
+        _text.text = _defaultText;
     }
 
     public void ColorDistrictUI(Color color, int currentDistrict)
@@ -56,5 +63,10 @@ public class UIManager : MonoBehaviour
         ClearSelection();
 
         districtUIObjects[currentDistrict].GetComponent<DistrictUI>().SetSelected(true);
+    }
+
+    public void UpdateText(string newText)
+    {
+        _text.text = newText;
     }
 }
